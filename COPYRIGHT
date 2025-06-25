@@ -1,0 +1,64 @@
+# Copyright Notice
+
+## Primary Copyright
+
+Copyright (c) 2024 Christopher Kelley
+
+## Additional Contributors
+
+The gcrypt project is the result of contributions from multiple individuals. 
+All contributors retain copyright on their contributions.
+
+## License
+
+This project is dual-licensed under:
+- MIT License (see LICENSE file)
+- Apache License, Version 2.0 (see LICENSE-APACHE file)
+
+You may choose to use this software under the terms of either license.
+
+## Third-Party Components
+
+This software incorporates ideas and algorithms from various sources:
+
+### Reference Implementations
+- **curve25519-dalek**: Mathematical algorithms and implementation patterns
+  - Copyright (c) 2016-2021 Isis Agora Lovecruft, Henry de Valence
+  - Licensed under BSD 3-Clause License
+  - Used as reference implementation only; no code directly incorporated
+
+### Standards and Specifications
+- **RFC 7748**: Elliptic Curves for Security
+- **RFC 8032**: Edwards-Curve Digital Signature Algorithm (EdDSA)
+- **RFC 9381**: Verifiable Random Functions (VRFs)
+
+### Dependencies
+All dependencies are used under their respective licenses as specified in Cargo.toml.
+See the individual crates for their copyright and licensing information:
+- subtle: Copyright (c) 2016-2017 Isis Lovecruft, Henry de Valence
+- rand_core: Copyright (c) 2018 Developers of the Rand project
+- zeroize: Copyright (c) 2018-2021 iqlusion
+- serde: Copyright (c) 2014 Erick Tryzelaar and David Tolnay
+
+## Patent Disclaimer
+
+To the best of our knowledge, this software does not infringe on any patents.
+The elliptic curve Curve25519 and its associated algorithms are believed to be
+free from patent restrictions. Users are responsible for ensuring their use
+complies with all applicable laws and regulations.
+
+## Trademark Notice
+
+The name "gcrypt" is not a registered trademark. All other trademarks mentioned
+in this software are the property of their respective owners.
+
+## Contribution Agreement
+
+By contributing to this project, you agree that your contributions will be
+licensed under the same dual MIT/Apache-2.0 license that covers the project.
+
+## Contact
+
+For questions about copyright or licensing, please contact:
+- GitHub Issues: https://github.com/CK-Technology/gcrypt/issues
+- Email: legal@gcrypt.rs

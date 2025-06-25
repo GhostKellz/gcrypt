@@ -1,0 +1,53 @@
+[package]
+name = "gcrypt"
+version = "0.2.0"
+edition = "2024"
+rust-version = "1.85.0"
+authors = ["Christopher Kelley"]
+license = "MIT OR Apache-2.0"
+description = "A modern, pure Rust cryptographic library focusing on Curve25519 and related algorithms"
+repository = "https://github.com/CK-Technology/gcrypt"
+categories = ["cryptography", "no-std"]
+keywords = ["cryptography", "curve25519", "ed25519", "x25519", "ristretto"]
+readme = "README.md"
+license-file = ["LICENSE", "LICENSE-APACHE"]
+homepage = "https://github.com/CK-Technology/gcrypt"
+documentation = "https://docs.rs/gcrypt"
+
+[features]
+default = ["alloc", "std", "rand_core"]
+std = ["alloc"]
+alloc = []
+rand_core = ["dep:rand_core"]
+serde = ["dep:serde"]
+zeroize = ["dep:zeroize"]
+group = ["dep:group", "dep:ff"]
+precomputed-tables = []
+legacy-compatibility = []
+# New features for production readiness
+simd = []  # Enable SIMD optimizations
+fiat-crypto = ["dep:fiat-crypto"]  # Formal verification
+security-audit = []  # Enable additional security checks
+benchmarks = ["dep:criterion"]  # Enable benchmark suite
+
+[dependencies]
+cfg-if = "1.0"
+subtle = { version = "2.5", default-features = false }
+rand_core = { version = "0.6", default-features = false, optional = true }
+serde = { version = "1.0", default-features = false, optional = true }
+zeroize = { version = "1.7", default-features = false, optional = true }
+group = { version = "0.13", default-features = false, optional = true }
+ff = { version = "0.13", default-features = false, optional = true }
+# New dependencies for production features
+fiat-crypto = { version = "0.2", default-features = false, optional = true }
+criterion = { version = "0.5", features = ["html_reports"], optional = true }
+
+[dev-dependencies]
+rand = "0.8"
+hex = "0.4"
+serde_json = "1.0"
+criterion = { version = "0.5", features = ["html_reports"] }
+# Additional test dependencies
+proptest = "1.0"  # Property-based testing
+wycheproof = "0.5"  # Google's crypto test vectors
+dudect = "0.4"  # Constant-time testing

@@ -1,0 +1,49 @@
+gcrypt - Modern Curve25519 Cryptographic Library
+Copyright 2024 Christopher Kelley and contributors
+
+This product includes software developed by Christopher Kelley
+and the gcrypt contributors (https://github.com/CK-Technology/gcrypt).
+
+## Acknowledgments
+
+This software was developed with reference to the following works:
+
+- curve25519-dalek by Isis Lovecruft and Henry de Valence
+  Used as a reference implementation for mathematical correctness
+  No code was directly copied; algorithms were independently implemented
+  
+- The Curve25519 and Ed25519 specifications by Daniel J. Bernstein
+  
+- IETF RFC 7748 (Elliptic Curves for Security)
+  
+- IETF RFC 8032 (Edwards-Curve Digital Signature Algorithm)
+
+## Third-Party Software
+
+This software uses the following third-party libraries:
+
+- subtle: Constant-time cryptographic utilities
+  Copyright (c) 2016-2017 Isis Lovecruft, Henry de Valence
+  Licensed under BSD-3-Clause
+
+- rand_core: Random number generation traits
+  Copyright (c) 2018 The Rand Project Developers
+  Licensed under MIT/Apache-2.0
+
+- zeroize: Secure memory zeroing
+  Copyright (c) 2018-2021 iqlusion
+  Licensed under MIT/Apache-2.0
+
+For complete license terms of dependencies, see their respective repositories.
+
+## Export Notice
+
+This software contains cryptographic functionality. The export of this
+software may be restricted by applicable laws and regulations. Users are
+responsible for compliance with all export control laws.
+
+## Patent Notice
+
+To the best of our knowledge, this software does not infringe any patents.
+The Curve25519 elliptic curve and associated algorithms are believed to be
+free from patent restrictions.
