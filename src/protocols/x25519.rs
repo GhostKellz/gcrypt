@@ -6,6 +6,10 @@
 use crate::{Scalar, MontgomeryPoint, FieldElement};
 use subtle::ConstantTimeEq;
 
+#[cfg(feature = "alloc")]
+use alloc::vec::Vec;
+use core::cmp;
+
 #[cfg(feature = "rand_core")]
 use rand_core::{CryptoRng, RngCore};
 
@@ -60,7 +64,7 @@ impl SecretKey {
         bytes[31] &= 127; // Clear top bit
         bytes[31] |= 64;  // Set second-highest bit
         
-        SecretKey(Scalar::from_bytes_mod_order(&bytes))
+        SecretKey(Scalar::from_bytes_mod_order(bytes))
     }
     
     /// Create a secret key from bytes with proper clamping
@@ -72,12 +76,12 @@ impl SecretKey {
         clamped[31] &= 127; // Clear top bit  
         clamped[31] |= 64;  // Set second-highest bit
         
-        SecretKey(Scalar::from_bytes_mod_order(&clamped))
+        SecretKey(Scalar::from_bytes_mod_order(clamped))
     }
     
     /// Create a secret key from raw bytes without clamping
     pub fn from_raw_bytes(bytes: &[u8; 32]) -> SecretKey {
-        SecretKey(Scalar::from_bytes_mod_order(bytes))
+        SecretKey(Scalar::from_bytes_mod_order(*bytes))
     }
     
     /// Convert secret key to bytes (clamped)
@@ -118,7 +122,7 @@ impl PublicKey {
     pub fn from_bytes(bytes: &[u8; 32]) -> Result<PublicKey, KeyExchangeError> {
         // For Montgomery points, all byte arrays are valid public keys
         // except for low-order points which we check during key exchange
-        Ok(PublicKey(MontgomeryPoint::from_bytes(bytes)))
+        Ok(PublicKey(MontgomeryPoint::from_bytes(*bytes)))
     }
     
     /// Convert public key to bytes
@@ -154,7 +158,7 @@ impl SharedSecret {
             
             let hash = simple_hash(&hasher_input);
             let remaining = length - output.len();
-            let to_take = core::cmp::min(remaining, 32);
+            let to_take = cmp::min(remaining, 32);
             
             output.extend_from_slice(&hash[..to_take]);
             counter += 1;

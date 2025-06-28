@@ -87,6 +87,7 @@ mod window;
 // Re-exports for convenience
 pub use crate::{
     edwards::EdwardsPoint,
+    field::FieldElement,
     montgomery::MontgomeryPoint, 
     ristretto::RistrettoPoint,
     scalar::Scalar,

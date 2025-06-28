@@ -105,7 +105,7 @@ impl MontgomeryPoint {
         let cb = &c * &b;
 
         *x1 = (&da + &cb).square();
-        *z1 = u * (&da - &cb).square();
+        *z1 = *u * (&da - &cb).square();
 
         let aa = a.square();
         let bb = b.square();
@@ -216,7 +216,7 @@ impl Mul<&MontgomeryPoint> for &Scalar {
 
 impl MulAssign<&Scalar> for MontgomeryPoint {
     fn mul_assign(&mut self, scalar: &Scalar) {
-        *self = self * scalar;
+        *self = &*self * scalar;
     }
 }
 
@@ -228,7 +228,11 @@ impl ConstantTimeEq for MontgomeryPoint {
 
 impl ConditionallySelectable for MontgomeryPoint {
     fn conditional_select(a: &Self, b: &Self, choice: Choice) -> Self {
-        MontgomeryPoint(<[u8; 32]>::conditional_select(&a.0, &b.0, choice))
+        let mut result = [0u8; 32];
+        for i in 0..32 {
+            result[i] = u8::conditional_select(&a.0[i], &b.0[i], choice);
+        }
+        MontgomeryPoint(result)
     }
 }
 

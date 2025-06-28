@@ -2,6 +2,11 @@
 //!
 //! This module provides a simplified implementation of Bulletproofs,
 //! which are short non-interactive zero-knowledge proofs.
+//!
+//! This module requires the `alloc` feature to be enabled.
+
+#[cfg(feature = "alloc")]
+use alloc::{vec, vec::Vec};
 
 use crate::{EdwardsPoint, Scalar, FieldElement};
 use subtle::ConstantTimeEq;
@@ -10,6 +15,7 @@ use subtle::ConstantTimeEq;
 use rand_core::{CryptoRng, RngCore};
 
 /// Bulletproof system parameters
+#[cfg(feature = "alloc")]
 #[derive(Clone, Debug)]
 pub struct BulletproofParams {
     /// Generator point G
@@ -36,6 +42,7 @@ pub struct PedersenCommitment {
 }
 
 /// A range proof showing that a committed value is in [0, 2^n)
+#[cfg(feature = "alloc")]
 #[derive(Clone, Debug)]
 pub struct RangeProof {
     /// The commitment being proved
@@ -52,6 +59,7 @@ pub struct RangeProof {
 }
 
 /// Inner product proof for bulletproofs
+#[cfg(feature = "alloc")]
 #[derive(Clone, Debug)]
 pub struct InnerProductProof {
     /// Left proof elements
@@ -90,6 +98,7 @@ impl core::fmt::Display for BulletproofError {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl BulletproofParams {
     /// Create new bulletproof parameters
     #[cfg(feature = "rand_core")]
@@ -136,7 +145,7 @@ impl BulletproofParams {
         
         // Hash to scalar and multiply base point
         let hash = simple_hash(&input);
-        let scalar = Scalar::from_bytes_mod_order(&hash);
+        let scalar = Scalar::from_bytes_mod_order(hash);
         EdwardsPoint::mul_base(&scalar)
     }
     
@@ -152,7 +161,9 @@ impl BulletproofParams {
         }
         
         let blinding = Scalar::random(rng);
-        let value_scalar = Scalar::from(value);
+        let mut value_bytes = [0u8; 32];
+        value_bytes[0..8].copy_from_slice(&value.to_le_bytes());
+        let value_scalar = Scalar::from_bytes_mod_order(value_bytes);
         
         // Commitment: C = [v]G + [r]H
         let point = &(&self.g * &value_scalar) + &(&self.h * &blinding);

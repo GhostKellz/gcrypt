@@ -4,7 +4,11 @@
 //! VRFs provide cryptographically verifiable pseudorandom outputs.
 
 use crate::{EdwardsPoint, Scalar, FieldElement};
+use crate::traits::{Compress, Decompress};
 use subtle::ConstantTimeEq;
+
+#[cfg(feature = "alloc")]
+use alloc::vec::Vec;
 
 #[cfg(feature = "rand_core")]
 use rand_core::{CryptoRng, RngCore};
@@ -79,7 +83,7 @@ impl VrfSecretKey {
     
     /// Create VRF secret key from bytes
     pub fn from_bytes(bytes: &[u8; 32]) -> VrfSecretKey {
-        let scalar = Scalar::from_bytes_mod_order(bytes);
+        let scalar = Scalar::from_bytes_mod_order(*bytes);
         let point = EdwardsPoint::mul_base(&scalar);
         
         VrfSecretKey {
@@ -138,7 +142,7 @@ impl VrfSecretKey {
         hasher_input.extend_from_slice(input);
         
         // Try to find a valid point
-        for counter in 0..256u8 {
+        for counter in 0..=255u8 {
             hasher_input.push(counter);
             let hash = simple_hash(&hasher_input);
             
@@ -162,7 +166,7 @@ impl VrfSecretKey {
         nonce_input.extend_from_slice(b"VRF_NONCE");
         
         let hash = simple_hash(&nonce_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
     
     /// Compute challenge for Fiat-Shamir
@@ -183,7 +187,7 @@ impl VrfSecretKey {
         challenge_input.extend_from_slice(input);
         
         let hash = simple_hash(&challenge_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
     
     /// Convert gamma point to VRF output
@@ -225,13 +229,13 @@ impl VrfPublicKey {
         let c_prime = self.compute_challenge(input, &self.point, &proof.gamma, &c1, &c2);
         
         // Verify challenge matches
-        if !proof.c.ct_eq(&c_prime).into() {
+        if !bool::from(proof.c.ct_eq(&c_prime)) {
             return Err(VrfError::InvalidProof);
         }
         
         // Verify output matches gamma
         let expected_output = self.gamma_to_output(&proof.gamma);
-        if !output.0.ct_eq(&expected_output.0).into() {
+        if !bool::from(output.0.ct_eq(&expected_output.0)) {
             return Err(VrfError::InvalidProof);
         }
         
@@ -245,7 +249,7 @@ impl VrfPublicKey {
         hasher_input.extend_from_slice(&self.point.compress().to_bytes());
         hasher_input.extend_from_slice(input);
         
-        for counter in 0..256u8 {
+        for counter in 0..=255u8 {
             hasher_input.push(counter);
             let hash = simple_hash(&hasher_input);
             
@@ -278,7 +282,7 @@ impl VrfPublicKey {
         challenge_input.extend_from_slice(input);
         
         let hash = simple_hash(&challenge_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
     
     /// Convert gamma to output (same as secret key version)
@@ -327,11 +331,11 @@ impl VrfProof {
         let gamma = gamma_compressed.decompress().ok_or(VrfError::InvalidProof)?;
         
         let c = Scalar::from_canonical_bytes(
-            &bytes[32..64].try_into().map_err(|_| VrfError::InvalidProof)?
+            bytes[32..64].try_into().map_err(|_| VrfError::InvalidProof)?
         ).ok_or(VrfError::InvalidProof)?;
         
         let s = Scalar::from_canonical_bytes(
-            &bytes[64..96].try_into().map_err(|_| VrfError::InvalidProof)?
+            bytes[64..96].try_into().map_err(|_| VrfError::InvalidProof)?
         ).ok_or(VrfError::InvalidProof)?;
         
         Ok(VrfProof { gamma, c, s })
@@ -422,7 +426,7 @@ mod tests {
         let (output, mut proof) = secret_key.evaluate(input).unwrap();
         
         // Corrupt the proof
-        proof.c = Scalar::from_bytes_mod_order(&[0u8; 32]);
+        proof.c = Scalar::from_bytes_mod_order([0u8; 32]);
         
         // Verification should fail
         assert!(public_key.verify(input, &output, &proof).is_err());

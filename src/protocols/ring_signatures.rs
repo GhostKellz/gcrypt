@@ -2,8 +2,14 @@
 //!
 //! Ring signatures provide anonymity by allowing a signer to sign on behalf of a group
 //! without revealing which member of the group actually signed.
+//!
+//! This module requires the `alloc` feature to be enabled.
+
+#[cfg(feature = "alloc")]
+use alloc::{vec, vec::Vec};
 
 use crate::{EdwardsPoint, Scalar};
+use crate::traits::{Compress, Decompress};
 use subtle::ConstantTimeEq;
 
 #[cfg(feature = "rand_core")]
@@ -17,6 +23,7 @@ pub struct RingMember {
 }
 
 /// A ring signature
+#[cfg(feature = "alloc")]
 #[derive(Clone, Debug)]
 pub struct RingSignature {
     /// The challenge values for each ring member
@@ -73,6 +80,7 @@ impl RingMember {
 }
 
 /// Ring signature implementation (Borromean style)
+#[cfg(feature = "alloc")]
 pub struct RingSigner {
     /// The ring members (public keys)
     ring: Vec<RingMember>,
@@ -82,6 +90,7 @@ pub struct RingSigner {
     signer_index: usize,
 }
 
+#[cfg(feature = "alloc")]
 impl RingSigner {
     /// Create a new ring signer
     pub fn new(ring: Vec<RingMember>, secret_key: Scalar, signer_index: usize) -> Result<Self, RingSignatureError> {
@@ -95,7 +104,7 @@ impl RingSigner {
         
         // Verify that the secret key corresponds to the claimed ring member
         let expected_public = EdwardsPoint::mul_base(&secret_key);
-        if !expected_public.ct_eq(&ring[signer_index].point).into() {
+        if !bool::from(expected_public.ct_eq(&ring[signer_index].point)) {
             return Err(RingSignatureError::MemberNotFound);
         }
         
@@ -231,7 +240,7 @@ impl RingSigner {
     /// Hash data to scalar
     fn hash_to_scalar(&self, data: &[u8]) -> Scalar {
         let hash = simple_hash(data);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
     
     /// Hash data to curve point (simplified)
@@ -254,11 +263,13 @@ impl RingSigner {
 }
 
 /// Ring signature verifier
+#[cfg(feature = "alloc")]
 pub struct RingVerifier {
     /// The ring members (public keys)
     ring: Vec<RingMember>,
 }
 
+#[cfg(feature = "alloc")]
 impl RingVerifier {
     /// Create a new ring verifier
     pub fn new(ring: Vec<RingMember>) -> Result<Self, RingSignatureError> {
@@ -310,10 +321,11 @@ impl RingVerifier {
     /// Hash data to scalar
     fn hash_to_scalar(&self, data: &[u8]) -> Scalar {
         let hash = simple_hash(data);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
 }
 
+#[cfg(feature = "alloc")]
 impl RingSignature {
     /// Convert signature to bytes
     pub fn to_bytes(&self) -> Vec<u8> {
@@ -363,7 +375,7 @@ impl RingSignature {
             }
             let challenge_bytes: [u8; 32] = bytes[offset..offset+32].try_into()
                 .map_err(|_| RingSignatureError::InvalidFormat)?;
-            challenges.push(Scalar::from_canonical_bytes(&challenge_bytes)
+            challenges.push(Scalar::from_canonical_bytes(challenge_bytes)
                 .ok_or(RingSignatureError::InvalidFormat)?);
             offset += 32;
         }
@@ -375,7 +387,7 @@ impl RingSignature {
             }
             let response_bytes: [u8; 32] = bytes[offset..offset+32].try_into()
                 .map_err(|_| RingSignatureError::InvalidFormat)?;
-            responses.push(Scalar::from_canonical_bytes(&response_bytes)
+            responses.push(Scalar::from_canonical_bytes(response_bytes)
                 .ok_or(RingSignatureError::InvalidFormat)?);
             offset += 32;
         }
@@ -500,8 +512,8 @@ mod tests {
     #[test]
     fn test_ring_signature_serialization() {
         // Create a simple signature for testing
-        let challenges = vec![Scalar::from_bytes_mod_order(&[1u8; 32])];
-        let responses = vec![Scalar::from_bytes_mod_order(&[2u8; 32])];
+        let challenges = vec![Scalar::from_bytes_mod_order([1u8; 32])];
+        let responses = vec![Scalar::from_bytes_mod_order([2u8; 32])];
         
         let signature = RingSignature {
             challenges,

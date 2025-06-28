@@ -1,5 +1,8 @@
 //! Version information and API compatibility
 
+#[cfg(feature = "alloc")]
+use alloc::string::String;
+
 /// The version of this crate
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -37,6 +40,7 @@ pub const fn api_compatibility() -> ApiCompatibility {
 pub const MSRV: &str = "1.85.0";
 
 /// Check if the current Rust version meets the MSRV requirement
+#[cfg(feature = "alloc")]
 pub fn check_msrv() -> Result<(), String> {
     // This would ideally check the actual Rust version at runtime
     // For now, we rely on Cargo.toml rust-version field

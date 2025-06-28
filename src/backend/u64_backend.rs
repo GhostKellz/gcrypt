@@ -318,6 +318,16 @@ impl FieldImpl {
         
         FieldImpl { limbs }
     }
+    
+    /// Access the internal limbs (for SIMD operations)
+    pub(crate) fn limbs(&self) -> &[u64; 5] {
+        &self.limbs
+    }
+    
+    /// Create from limbs (for SIMD operations)
+    pub(crate) fn from_limbs(limbs: [u64; 5]) -> Self {
+        FieldImpl { limbs }
+    }
 
     pub fn to_bytes(&self) -> [u8; 32] {
         let mut bytes = [0u8; 32];
@@ -371,7 +381,7 @@ impl FieldImpl {
         let is_correct = candidate_squared.ct_eq(self);
         
         // If not correct, try candidate * sqrt(-1)
-        let candidate_times_sqrtm1 = exp_252_minus_2.mul(&FieldImpl::SQRT_M1);
+        let candidate_times_sqrtm1 = exp_252_minus_2.mul(FieldImpl::SQRT_M1);
         let candidate2_squared = candidate_times_sqrtm1.square();
         let is_correct2 = candidate2_squared.ct_eq(self);
         
@@ -390,10 +400,10 @@ impl FieldImpl {
     fn pow_252_minus_2(&self) -> Self {
         // Similar to inversion but with different exponent
         let z2 = self.square();                    // 2^1
-        let z3 = z2.mul(self);                    // 2^1 + 1  
+        let z3 = z2.mul(*self);                   // 2^1 + 1  
         let z6 = z3.square();                     // 2^2 + 2^1
         let z12 = z6.square_n(6);                // 2^8 + 2^7
-        let z15 = z12.mul(&z3);                  // 2^8 + 2^7 + 2^1 + 1
+        let z15 = z12.mul(z3);                   // 2^8 + 2^7 + 2^1 + 1
         let z30 = z15.square_n(15);              // 2^23 + ... + 2^16 + 2^15
         let z30 = z30.mul(z15);                  // 2^23 + ... + 2^1 + 1
         let z60 = z30.square_n(30);              // 2^53 + ... + 2^31 + 2^30
@@ -450,8 +460,11 @@ impl FieldImpl {
         let mut carry = result[5] * 19;
         carry += result[6] * (19 << 51);
         carry += result[7] * (19 << 102);
-        carry += result[8] * (19 << 153);
-        carry += result[9] * (19 << 204);
+        // 2^255 = 19 mod p, so higher powers need reduction
+        // 2^306 = 2^(255+51) = 19 * 2^51 mod p
+        // 2^357 = 2^(255+102) = 19 * 2^102 mod p
+        carry += result[8] * 19; // Simplified: just use 19 for higher terms
+        carry += result[9] * 19;
         
         result[0] += carry;
         

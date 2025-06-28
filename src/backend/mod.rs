@@ -5,6 +5,7 @@
 
 use crate::scalar::Scalar;
 use crate::field::FieldElement;
+use crate::traits::Identity;
 
 cfg_if::cfg_if! {
     if #[cfg(target_pointer_width = "64")] {
@@ -25,9 +26,9 @@ pub use simd_avx2::{FieldElement4x, EdwardsPoint4x, multiscalar_mul_simd};
 
 /// Runtime CPU feature detection for backend selection
 pub fn get_optimal_backend() -> BackendType {
-    #[cfg(target_arch = "x86_64")]
+    #[cfg(all(target_arch = "x86_64", feature = "std"))]
     {
-        if is_x86_feature_detected!("avx2") {
+        if std::is_x86_feature_detected!("avx2") {
             return BackendType::Avx2;
         }
     }
@@ -52,9 +53,9 @@ pub enum BackendType {
 
 /// Multi-scalar multiplication with automatic backend selection
 pub fn multiscalar_mul_auto(scalars: &[Scalar], points: &[crate::EdwardsPoint]) -> crate::EdwardsPoint {
-    #[cfg(all(target_arch = "x86_64", target_feature = "avx2"))]
+    #[cfg(all(target_arch = "x86_64", target_feature = "avx2", feature = "std"))]
     {
-        if is_x86_feature_detected!("avx2") && scalars.len() >= 4 && scalars.len() % 4 == 0 {
+        if std::is_x86_feature_detected!("avx2") && scalars.len() >= 4 && scalars.len() % 4 == 0 {
             return multiscalar_mul_simd(scalars, points);
         }
     }

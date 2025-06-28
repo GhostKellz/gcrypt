@@ -4,7 +4,11 @@
 //! Ed25519 provides fast, secure digital signatures using the Edwards form of Curve25519.
 
 use crate::{EdwardsPoint, Scalar, FieldElement};
+use crate::traits::{Compress, Decompress};
 use subtle::{Choice, ConstantTimeEq};
+
+#[cfg(feature = "alloc")]
+use alloc::vec::Vec;
 
 #[cfg(feature = "rand_core")]
 use rand_core::{CryptoRng, RngCore};
@@ -82,7 +86,7 @@ impl SecretKey {
     
     /// Create a secret key from bytes
     pub fn from_bytes(bytes: &[u8; 32]) -> SecretKey {
-        let scalar = Scalar::from_bytes_mod_order(bytes);
+        let scalar = Scalar::from_bytes_mod_order(*bytes);
         let public_point = EdwardsPoint::mul_base(&scalar);
         let compressed = public_point.compress().to_bytes();
         
@@ -160,7 +164,7 @@ impl SecretKey {
         
         // Hash the input (simplified - would use SHA-512 in real implementation)
         let hash = simple_hash(&hasher_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
     
     /// Derive deterministic nonce
@@ -172,7 +176,7 @@ impl SecretKey {
         input.extend_from_slice(message);
         
         let hash = simple_hash(&input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
 }
 
@@ -199,7 +203,7 @@ impl PublicKey {
     pub fn verify(&self, message: &[u8], signature: &Signature) -> Result<(), SignatureError> {
         // Parse signature components
         let r_bytes = signature.r;
-        let s_scalar = Scalar::from_canonical_bytes(&signature.s)
+        let s_scalar = Scalar::from_canonical_bytes(signature.s)
             .ok_or(SignatureError::InvalidSignature)?;
         
         // Decompress R point
@@ -229,7 +233,7 @@ impl PublicKey {
         hasher_input.extend_from_slice(message);
         
         let hash = simple_hash(&hasher_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
 }
 

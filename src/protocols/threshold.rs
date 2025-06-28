@@ -2,9 +2,16 @@
 //!
 //! This module provides threshold signature schemes where multiple parties
 //! must cooperate to create a valid signature.
+//!
+//! This module requires the `alloc` feature to be enabled.
+
+#[cfg(feature = "alloc")]
+use alloc::{vec, vec::Vec};
 
 use crate::{EdwardsPoint, Scalar};
+use crate::traits::Compress;
 use subtle::ConstantTimeEq;
+use core::ops::Neg;
 
 #[cfg(feature = "rand_core")]
 use rand_core::{CryptoRng, RngCore};
@@ -41,6 +48,7 @@ pub struct PartialSignature {
 }
 
 /// Complete threshold signature
+#[cfg(feature = "alloc")]
 #[derive(Clone, Debug)]
 pub struct ThresholdSignature {
     /// The final signature
@@ -82,6 +90,7 @@ impl core::fmt::Display for ThresholdError {
 }
 
 /// Threshold signature coordinator
+#[cfg(feature = "alloc")]
 pub struct ThresholdCoordinator {
     /// Threshold configuration
     config: ThresholdConfig,
@@ -140,7 +149,9 @@ impl ThresholdConfig {
     /// Evaluate polynomial at given x value for Shamir's secret sharing
     fn evaluate_polynomial(&self, coefficients: &[Scalar], x: u32) -> Scalar {
         let mut result = Scalar::ZERO;
-        let x_scalar = Scalar::from(x as u64);
+        let mut x_bytes = [0u8; 32];
+        x_bytes[0..8].copy_from_slice(&(x as u64).to_le_bytes());
+        let x_scalar = Scalar::from_bytes_mod_order(x_bytes);
         
         for (i, &coeff) in coefficients.iter().enumerate() {
             // Compute coeff * x^i
@@ -208,7 +219,7 @@ impl ThresholdParticipant {
         challenge_input.extend_from_slice(&self.id.to_le_bytes());
         
         let hash = simple_hash(&challenge_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
     
     /// Derive deterministic nonce
@@ -220,10 +231,11 @@ impl ThresholdParticipant {
         nonce_input.extend_from_slice(b"THRESHOLD_NONCE");
         
         let hash = simple_hash(&nonce_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
 }
 
+#[cfg(feature = "alloc")]
 impl ThresholdCoordinator {
     /// Create a new threshold coordinator
     pub fn new(
@@ -300,10 +312,16 @@ impl ThresholdCoordinator {
                     let x_j = signatures[j].participant_id;
                     
                     // numerator *= (0 - x_j) = -x_j
-                    numerator = &numerator * &Scalar::from(x_j as u64).neg();
+                    let mut x_j_bytes = [0u8; 32];
+                    x_j_bytes[0..8].copy_from_slice(&(x_j as u64).to_le_bytes());
+                    numerator = &numerator * &Scalar::from_bytes_mod_order(x_j_bytes).neg();
                     
                     // denominator *= (x_i - x_j)
-                    let diff = Scalar::from(x_i as u64) - Scalar::from(x_j as u64);
+                    let mut x_i_bytes = [0u8; 32];
+                    x_i_bytes[0..8].copy_from_slice(&(x_i as u64).to_le_bytes());
+                    let mut x_j_bytes = [0u8; 32];
+                    x_j_bytes[0..8].copy_from_slice(&(x_j as u64).to_le_bytes());
+                    let diff = Scalar::from_bytes_mod_order(x_i_bytes) - Scalar::from_bytes_mod_order(x_j_bytes);
                     denominator = &denominator * &diff;
                 }
             }
@@ -363,7 +381,7 @@ impl ThresholdCoordinator {
         challenge_input.extend_from_slice(&participant_id.to_le_bytes());
         
         let hash = simple_hash(&challenge_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
     
     /// Verify a complete threshold signature
@@ -399,7 +417,7 @@ impl ThresholdCoordinator {
         challenge_input.extend_from_slice(b"THRESHOLD");
         
         let hash = simple_hash(&challenge_input);
-        Scalar::from_bytes_mod_order(&hash)
+        Scalar::from_bytes_mod_order(hash)
     }
 }
 

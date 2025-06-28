@@ -6,6 +6,7 @@
 use core::arch::x86_64::*;
 
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq};
+use crate::traits::Identity;
 
 /// Four field elements processed in parallel using AVX2
 #[derive(Copy, Clone, Debug)]
@@ -44,17 +45,17 @@ impl FieldElement4x {
             let mut limbs = [_mm256_setzero_si256(); 5];
             
             // Extract backend implementations
-            let a_impl = crate::backend::FieldImpl::from(*a);
-            let b_impl = crate::backend::FieldImpl::from(*b);
-            let c_impl = crate::backend::FieldImpl::from(*c);
-            let d_impl = crate::backend::FieldImpl::from(*d);
+            let a_impl = &a.0;
+            let b_impl = &b.0;
+            let c_impl = &c.0;
+            let d_impl = &d.0;
             
             for i in 0..5 {
                 limbs[i] = _mm256_set_epi64x(
-                    d_impl.limbs[i] as i64,
-                    c_impl.limbs[i] as i64,
-                    b_impl.limbs[i] as i64,
-                    a_impl.limbs[i] as i64,
+                    d_impl.limbs()[i] as i64,
+                    c_impl.limbs()[i] as i64,
+                    b_impl.limbs()[i] as i64,
+                    a_impl.limbs()[i] as i64,
                 );
             }
             
@@ -67,16 +68,23 @@ impl FieldElement4x {
         unsafe {
             let mut result = [crate::FieldElement::ZERO; 4];
             
-            for i in 0..4 {
-                let mut limbs = [0u64; 5];
-                for j in 0..5 {
-                    let extracted = _mm256_extract_epi64(self.limbs[j], i);
-                    limbs[j] = extracted as u64;
-                }
-                
-                let field_impl = crate::backend::FieldImpl { limbs };
-                result[i] = crate::FieldElement(field_impl);
+            // Extract each lane manually since _mm256_extract_epi64 requires const index
+            let mut limbs0 = [0u64; 5];
+            let mut limbs1 = [0u64; 5];
+            let mut limbs2 = [0u64; 5];
+            let mut limbs3 = [0u64; 5];
+            
+            for j in 0..5 {
+                limbs0[j] = _mm256_extract_epi64(self.limbs[j], 0) as u64;
+                limbs1[j] = _mm256_extract_epi64(self.limbs[j], 1) as u64;
+                limbs2[j] = _mm256_extract_epi64(self.limbs[j], 2) as u64;
+                limbs3[j] = _mm256_extract_epi64(self.limbs[j], 3) as u64;
             }
+            
+            result[0] = crate::FieldElement(crate::backend::FieldImpl::from_limbs(limbs0));
+            result[1] = crate::FieldElement(crate::backend::FieldImpl::from_limbs(limbs1));
+            result[2] = crate::FieldElement(crate::backend::FieldImpl::from_limbs(limbs2));
+            result[3] = crate::FieldElement(crate::backend::FieldImpl::from_limbs(limbs3));
             
             result
         }
@@ -105,7 +113,14 @@ impl FieldElement4x {
             
             // Handle final carry with reduction mod 2^255 - 19
             // carry * 19 gets added to limb 0
-            let carry_times_19 = _mm256_mullo_epi64(carry, _mm256_set1_epi64x(19));
+            // Use manual 64-bit multiplication since _mm256_mullo_epi64 is unstable
+            let carry_arr = [
+                _mm256_extract_epi64(carry, 0) * 19,
+                _mm256_extract_epi64(carry, 1) * 19,
+                _mm256_extract_epi64(carry, 2) * 19,
+                _mm256_extract_epi64(carry, 3) * 19,
+            ];
+            let carry_times_19 = _mm256_set_epi64x(carry_arr[3], carry_arr[2], carry_arr[1], carry_arr[0]);
             result_limbs[0] = _mm256_add_epi64(result_limbs[0], carry_times_19);
             
             // Propagate any final carry

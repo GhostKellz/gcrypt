@@ -10,7 +10,6 @@ repository = "https://github.com/CK-Technology/gcrypt"
 categories = ["cryptography", "no-std"]
 keywords = ["cryptography", "curve25519", "ed25519", "x25519", "ristretto"]
 readme = "README.md"
-license-file = "LICENSE"
 homepage = "https://github.com/ghostkellz/gcrypt"
 documentation = "https://docs.rs/gcrypt"
 
@@ -50,4 +49,3 @@ criterion = { version = "0.5", features = ["html_reports"] }
 # Additional test dependencies
 proptest = "1.0"  # Property-based testing
 wycheproof = "0.5"  # Google's crypto test vectors
-dudect = "0.4"  # Constant-time testing

@@ -34,6 +34,13 @@ pub struct EdwardsPoint {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct CompressedEdwardsY(pub [u8; 32]);
 
+impl CompressedEdwardsY {
+    /// Convert to bytes
+    pub fn to_bytes(&self) -> [u8; 32] {
+        self.0
+    }
+}
+
 impl EdwardsPoint {
     /// The identity element (neutral element) of the Edwards curve.
     pub const IDENTITY: EdwardsPoint = EdwardsPoint {
