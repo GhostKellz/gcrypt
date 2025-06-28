@@ -23,6 +23,10 @@ zeroize = ["dep:zeroize"]
 group = ["dep:group", "dep:ff"]
 precomputed-tables = []
 legacy-compatibility = []
+# Cryptographic algorithm features needed by gquic and walletd
+ed25519 = []
+secp256k1 = []
+blake3 = []
 # New features for production readiness
 simd = []  # Enable SIMD optimizations
 fiat-crypto = ["dep:fiat-crypto"]  # Formal verification
