@@ -4,14 +4,14 @@ version = "0.2.0"
 edition = "2024"
 rust-version = "1.85.0"
 authors = ["Christopher Kelley"]
-license = "MIT OR Apache-2.0"
+license = "MIT"
 description = "A modern, pure Rust cryptographic library focusing on Curve25519 and related algorithms"
 repository = "https://github.com/CK-Technology/gcrypt"
 categories = ["cryptography", "no-std"]
 keywords = ["cryptography", "curve25519", "ed25519", "x25519", "ristretto"]
 readme = "README.md"
-license-file = ["LICENSE", "LICENSE-APACHE"]
-homepage = "https://github.com/CK-Technology/gcrypt"
+license-file = "LICENSE"
+homepage = "https://github.com/ghostkellz/gcrypt"
 documentation = "https://docs.rs/gcrypt"
 
 [features]
