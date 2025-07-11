@@ -9,6 +9,7 @@ pub mod vrf;
 pub mod ring_signatures;
 pub mod threshold;
 pub mod bulletproofs;
+pub mod aes_gcm;
 
 pub use ed25519::*;
 pub use x25519::*;
@@ -16,3 +17,4 @@ pub use vrf::*;
 pub use ring_signatures::*;
 pub use threshold::*;
 pub use bulletproofs::*;
+pub use aes_gcm::*;

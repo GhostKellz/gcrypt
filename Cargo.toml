@@ -1,6 +1,6 @@
 [package]
 name = "gcrypt"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 rust-version = "1.85.0"
 authors = ["Christopher Kelley"]
@@ -27,6 +27,7 @@ legacy-compatibility = []
 ed25519 = []
 secp256k1 = []
 blake3 = []
+aes-gcm = ["dep:aes-gcm"]
 # New features for production readiness
 simd = []  # Enable SIMD optimizations
 fiat-crypto = ["dep:fiat-crypto"]  # Formal verification
@@ -36,7 +37,7 @@ benchmarks = ["dep:criterion"]  # Enable benchmark suite
 [dependencies]
 cfg-if = "1.0"
 subtle = { version = "2.5", default-features = false }
-rand_core = { version = "0.6", default-features = false, optional = true }
+rand_core = { version = "0.6", default-features = false, features = ["getrandom"], optional = true }
 serde = { version = "1.0", default-features = false, optional = true }
 zeroize = { version = "1.7", default-features = false, optional = true }
 group = { version = "0.13", default-features = false, optional = true }
@@ -44,6 +45,7 @@ ff = { version = "0.13", default-features = false, optional = true }
 # New dependencies for production features
 fiat-crypto = { version = "0.2", default-features = false, optional = true }
 criterion = { version = "0.5", features = ["html_reports"], optional = true }
+aes-gcm = { version = "0.10", default-features = false, features = ["aes", "alloc"], optional = true }
 
 [dev-dependencies]
 rand = "0.8"

@@ -30,6 +30,7 @@
 //! - `simd`: Enable SIMD vectorization for performance
 //! - `fiat-crypto`: Enable formal verification integration
 //! - `precomputed-tables`: Enable precomputed lookup tables for faster operations
+//! - `aes-gcm`: Enable AES-GCM authenticated encryption support
 //!
 //! ## Example
 //!
@@ -103,3 +104,6 @@ pub use rand_core;
 
 #[cfg(feature = "group")]
 pub use {group, ff};
+
+#[cfg(feature = "aes-gcm")]
+pub use aes_gcm;
