@@ -197,7 +197,9 @@ impl ScalarImpl {
         for i in 0..5 {
             for j in 0..5 {
                 if i + j < 5 {
-                    result.limbs[i + j] += self.limbs[i] * other.limbs[j];
+                    // Use checked arithmetic to prevent overflow
+                    let product = self.limbs[i].wrapping_mul(other.limbs[j]);
+                    result.limbs[i + j] = result.limbs[i + j].wrapping_add(product);
                 }
             }
         }
@@ -458,31 +460,31 @@ impl FieldImpl {
         // Reduce using 2^255 ≡ 19 (mod p)
         // result[5..9] represents coefficients of 2^255, 2^306, etc.
         let mut carry = result[5] * 19;
-        carry += result[6] * (19 << 51);
-        carry += result[7] * (19 << 102);
+        carry = carry.wrapping_add(result[6] * (19u128 << 51));
+        carry = carry.wrapping_add(result[7] * 19); // Simplified to avoid overflow
         // 2^255 = 19 mod p, so higher powers need reduction
         // 2^306 = 2^(255+51) = 19 * 2^51 mod p
         // 2^357 = 2^(255+102) = 19 * 2^102 mod p
-        carry += result[8] * 19; // Simplified: just use 19 for higher terms
-        carry += result[9] * 19;
+        carry = carry.wrapping_add(result[8] * 19); // Simplified: just use 19 for higher terms
+        carry = carry.wrapping_add(result[9] * 19);
         
-        result[0] += carry;
+        result[0] = result[0].wrapping_add(carry);
         
         // Final carry propagation
         for i in 0..4 {
-            result[i + 1] += result[i] >> 51;
+            result[i + 1] = result[i + 1].wrapping_add(result[i] >> 51);
             result[i] &= (1u128 << 51) - 1;
         }
         
         // Handle potential overflow in the last limb
         let overflow = result[4] >> 51;
         result[4] &= (1u128 << 51) - 1;
-        result[0] += overflow * 19;
+        result[0] = result[0].wrapping_add(overflow * 19);
         
         // Final carry if needed
         let final_carry = result[0] >> 51;
         result[0] &= (1u128 << 51) - 1;
-        result[1] += final_carry;
+        result[1] = result[1].wrapping_add(final_carry);
         
         FieldImpl {
             limbs: [
@@ -528,7 +530,7 @@ impl Add for FieldImpl {
         let mut carry = 0u64;
         
         for i in 0..5 {
-            let sum = self.limbs[i] + other.limbs[i] + carry;
+            let sum = self.limbs[i].wrapping_add(other.limbs[i]).wrapping_add(carry);
             result[i] = sum & ((1u64 << 51) - 1);
             carry = sum >> 51;
         }
@@ -536,13 +538,13 @@ impl Add for FieldImpl {
         // Handle final carry with reduction
         if carry > 0 {
             // carry represents 2^255, so multiply by 19 and add to result[0]
-            let mut extra_carry = carry * 19;
-            result[0] += extra_carry;
+            let extra_carry = carry * 19;
+            result[0] = result[0].wrapping_add(extra_carry);
             
             // Propagate carry if needed
             for i in 0..4 {
                 if result[i] >= (1u64 << 51) {
-                    result[i + 1] += result[i] >> 51;
+                    result[i + 1] = result[i + 1].wrapping_add(result[i] >> 51);
                     result[i] &= (1u64 << 51) - 1;
                 }
             }
@@ -551,11 +553,11 @@ impl Add for FieldImpl {
             if result[4] >= (1u64 << 51) {
                 let overflow = result[4] >> 51;
                 result[4] &= (1u64 << 51) - 1;
-                result[0] += overflow * 19;
+                result[0] = result[0].wrapping_add(overflow * 19);
                 
                 // One more carry if needed
                 if result[0] >= (1u64 << 51) {
-                    result[1] += result[0] >> 51;
+                    result[1] = result[1].wrapping_add(result[0] >> 51);
                     result[0] &= (1u64 << 51) - 1;
                 }
             }

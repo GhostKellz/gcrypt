@@ -321,6 +321,7 @@ pub fn multiscalar_mul_simd(scalars: &[crate::Scalar], points: &[crate::EdwardsP
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::is_x86_feature_detected;
     
     #[test]
     #[cfg(target_arch = "x86_64")]

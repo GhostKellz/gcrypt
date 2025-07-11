@@ -517,8 +517,8 @@ mod tests {
         
         let participant1 = ThresholdParticipant {
             id: 1,
-            secret_share: Scalar::from_bytes_mod_order(&[1u8; 32]),
-            public_share: EdwardsPoint::mul_base(&Scalar::from_bytes_mod_order(&[1u8; 32])),
+            secret_share: Scalar::from_bytes_mod_order([1u8; 32]),
+            public_share: EdwardsPoint::mul_base(&Scalar::from_bytes_mod_order([1u8; 32])),
         };
         
         let message = b"Deterministic test";
@@ -528,7 +528,7 @@ mod tests {
         let sig2 = participant1.sign_partial_deterministic(message);
         
         assert_eq!(sig1.participant_id, sig2.participant_id);
-        assert!(sig1.signature.ct_eq(&sig2.signature).into());
-        assert!(sig1.commitment.ct_eq(&sig2.commitment).into());
+        assert!(bool::from(sig1.signature.ct_eq(&sig2.signature)));
+        assert!(bool::from(sig1.commitment.ct_eq(&sig2.commitment)));
     }
 }

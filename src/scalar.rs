@@ -89,7 +89,7 @@ impl Scalar {
         // Check if bytes < BASEPOINT_ORDER
         let mut c = 0u8;
         for i in (0..32).rev() {
-            c = ((((bytes[i] as u16) - (BASEPOINT_ORDER.bytes[i] as u16)) >> 8) & 1) as u8;
+            c = ((((bytes[i] as u16).wrapping_sub(BASEPOINT_ORDER.bytes[i] as u16)) >> 8) & 1) as u8;
             if c != 0 {
                 break;
             }

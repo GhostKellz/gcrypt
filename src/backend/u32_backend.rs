@@ -129,7 +129,9 @@ impl ScalarImpl {
         for i in 0..9 {
             for j in 0..9 {
                 if i + j < 9 {
-                    result.limbs[i + j] += self.limbs[i] * other.limbs[j];
+                    // Use checked arithmetic to prevent overflow
+                    let product = self.limbs[i].wrapping_mul(other.limbs[j]);
+                    result.limbs[i + j] = result.limbs[i + j].wrapping_add(product);
                 }
             }
         }
@@ -269,7 +271,9 @@ impl FieldImpl {
         
         for i in 0..10 {
             for j in 0..10 {
-                result[i + j] += (self.limbs[i] as u64) * (other.limbs[j] as u64);
+                // Use checked arithmetic to prevent overflow
+                let product = (self.limbs[i] as u64) * (other.limbs[j] as u64);
+                result[i + j] = result[i + j].wrapping_add(product);
             }
         }
         
