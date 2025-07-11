@@ -257,22 +257,22 @@ impl FieldImpl {
     // Edwards curve parameter d = -121665/121666 mod p
     pub const EDWARDS_D: FieldImpl = FieldImpl {
         limbs: [
-            0x78a3d0a7ed5cd,  // -121665/121666 mod p, limb 0
-            0x695e41e5b89b4,  // limb 1
-            0x7ffffffffffff,  // limb 2
-            0x7ffffffffffff,  // limb 3
-            0x52036cee2b6fe,  // limb 4
+            929955233495203,
+            466365720129213,
+            1662059464998953,
+            2033849074728123,
+            1442794654840575,
         ]
     };
     
     // Edwards curve parameter d2 = 2*d mod p
     pub const EDWARDS_D2: FieldImpl = FieldImpl {
         limbs: [
-            0xf147a14fad9a,   // 2*d mod p, limb 0
-            0xd2bc83cb713688,  // limb 1
-            0x7ffffffffffff,  // limb 2  
-            0x7ffffffffffff,  // limb 3
-            0xa406d9dc56dfd,   // limb 4
+            1859910466990425,
+            932731440258426,
+            1072319116312658,
+            1815898335770999,
+            633789495995903,
         ]
     };
     
@@ -289,11 +289,11 @@ impl FieldImpl {
     // sqrt(-1) in the field
     pub const SQRT_M1: FieldImpl = FieldImpl {
         limbs: [
-            0x61b274a0ea0b0,  // sqrt(-1) mod p, limb 0
-            0xd5a5fc8f189d,   // limb 1
-            0x7ef5e9cbd0c60,  // limb 2
-            0x78595a6804c9e,  // limb 3
-            0x2b8324804fc1d,  // limb 4
+            1718705420411056,
+            234908883556509,
+            2233514472574048,
+            2117202627021982,
+            765476049583133,
         ]
     };
     
@@ -303,7 +303,7 @@ impl FieldImpl {
     pub fn from_bytes(bytes: &[u8; 32]) -> Self {
         let mut limbs = [0u64; 5];
         
-        // Pack bytes into 51-bit limbs
+        // Pack bytes into 51-bit limbs (similar to dalek curve25519)
         limbs[0] = u64::from_le_bytes([
             bytes[0], bytes[1], bytes[2], bytes[3],
             bytes[4], bytes[5], bytes[6] & 0x07, 0
@@ -315,8 +315,23 @@ impl FieldImpl {
             bytes[11], bytes[12], bytes[13] & 0x3f, 0
         ]);
         
-        // Continue for remaining limbs...
-        // Simplified implementation
+        limbs[2] = u64::from_le_bytes([
+            (bytes[13] >> 6) | (bytes[14] << 2) | (bytes[15] << 10),
+            bytes[16], bytes[17], bytes[18],
+            bytes[19], bytes[20] & 0x01, 0, 0
+        ]);
+        
+        limbs[3] = u64::from_le_bytes([
+            (bytes[20] >> 1) | (bytes[21] << 7),
+            bytes[22], bytes[23], bytes[24],
+            bytes[25], bytes[26], bytes[27] & 0x0f, 0
+        ]);
+        
+        limbs[4] = u64::from_le_bytes([
+            (bytes[27] >> 4) | (bytes[28] << 4),
+            bytes[29], bytes[30], bytes[31] & 0x7f,
+            0, 0, 0, 0
+        ]);
         
         FieldImpl { limbs }
     }
