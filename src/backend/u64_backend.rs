@@ -123,8 +123,8 @@ impl ScalarImpl {
             // Subtract l
             let mut borrow = 0u64;
             for i in 0..5 {
-                let diff = (limbs[i] as u128) - (l[i] as u128) - (borrow as u128);
-                if diff < 0 {
+                let diff = (limbs[i] as u128).wrapping_sub((l[i] as u128) + (borrow as u128));
+                if diff > (u64::MAX as u128) {
                     limbs[i] = (diff + (1u128 << 52)) as u64;
                     borrow = 1;
                 } else {
@@ -315,10 +315,11 @@ impl FieldImpl {
             bytes[11], bytes[12], bytes[13] & 0x3f, 0
         ]);
         
+        // Properly handle bit packing to avoid overflow
+        let byte0 = (bytes[13] >> 6) | (bytes[14] << 2);
         limbs[2] = u64::from_le_bytes([
-            (bytes[13] >> 6) | (bytes[14] << 2) | (bytes[15] << 10),
-            bytes[16], bytes[17], bytes[18],
-            bytes[19], bytes[20] & 0x01, 0, 0
+            byte0, bytes[15], bytes[16], bytes[17],
+            bytes[18], bytes[19], bytes[20] & 0x01, 0
         ]);
         
         limbs[3] = u64::from_le_bytes([

@@ -25,8 +25,9 @@ precomputed-tables = []
 legacy-compatibility = []
 # Cryptographic algorithm features needed by gquic and walletd
 ed25519 = []
-secp256k1 = []
+secp256k1 = ["dep:secp256k1", "dep:bitcoin_hashes"]
 blake3 = []
+bls12_381 = ["dep:bls12_381", "dep:blst", "dep:sha2"]
 aes-gcm = ["dep:aes-gcm"]
 # New features for production readiness
 simd = []  # Enable SIMD optimizations
@@ -46,6 +47,11 @@ ff = { version = "0.13", default-features = false, optional = true }
 fiat-crypto = { version = "0.2", default-features = false, optional = true }
 criterion = { version = "0.5", features = ["html_reports"], optional = true }
 aes-gcm = { version = "0.10", default-features = false, features = ["aes", "alloc"], optional = true }
+secp256k1 = { version = "0.31", default-features = false, features = ["recovery", "rand"], optional = true }
+bitcoin_hashes = { version = "0.15", default-features = false, optional = true }
+bls12_381 = { version = "0.8", default-features = false, features = ["alloc", "groups", "pairings", "experimental"], optional = true }
+sha2 = { version = "0.10", default-features = false, optional = true }
+blst = { version = "0.3", default-features = false, optional = true }
 
 [dev-dependencies]
 rand = "0.8"

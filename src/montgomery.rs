@@ -256,7 +256,13 @@ impl Zeroize for MontgomeryPoint {
 /// Given a secret scalar `k` and a public u-coordinate `u`,
 /// compute the shared secret `k * u`.
 pub fn x25519(k: [u8; 32], u: [u8; 32]) -> [u8; 32] {
-    MontgomeryPoint(u).mul_clamped(k).to_bytes()
+    // Clamp the scalar according to X25519 specification
+    let mut clamped_scalar = k;
+    clamped_scalar[0] &= 248;
+    clamped_scalar[31] &= 127;
+    clamped_scalar[31] |= 64;
+
+    MontgomeryPoint(u).mul_clamped(clamped_scalar).to_bytes()
 }
 
 #[cfg(test)]

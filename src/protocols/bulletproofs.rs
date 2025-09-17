@@ -6,10 +6,9 @@
 //! This module requires the `alloc` feature to be enabled.
 
 #[cfg(feature = "alloc")]
-use alloc::{vec, vec::Vec};
+use alloc::vec::Vec;
 
-use crate::{EdwardsPoint, Scalar, FieldElement};
-use subtle::ConstantTimeEq;
+use crate::{EdwardsPoint, Scalar};
 
 #[cfg(feature = "rand_core")]
 use rand_core::{CryptoRng, RngCore};
@@ -51,10 +50,13 @@ pub struct RangeProof {
     pub inner_product_proof: InnerProductProof,
     /// Additional proof elements
     pub l_vec: Vec<EdwardsPoint>,
+    /// Right proof vector elements
     pub r_vec: Vec<EdwardsPoint>,
     /// Final proof values
     pub t_x: Scalar,
+    /// Tau x scalar value
     pub tau_x: Scalar,
+    /// Mu scalar value
     pub mu: Scalar,
 }
 
@@ -68,6 +70,7 @@ pub struct InnerProductProof {
     pub r_vec: Vec<EdwardsPoint>,
     /// Final scalar values
     pub a: Scalar,
+    /// Final b scalar value
     pub b: Scalar,
 }
 

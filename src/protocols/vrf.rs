@@ -3,7 +3,7 @@
 //! This module implements ECVRF-EDWARDS25519-SHA256-TAI as specified in RFC 9381.
 //! VRFs provide cryptographically verifiable pseudorandom outputs.
 
-use crate::{EdwardsPoint, Scalar, FieldElement};
+use crate::{EdwardsPoint, Scalar};
 use crate::traits::{Compress, Decompress};
 use subtle::ConstantTimeEq;
 

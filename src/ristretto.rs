@@ -55,17 +55,19 @@ impl RistrettoPoint {
 
     /// Fixed-base scalar multiplication with the Ristretto255 basepoint.
     pub fn mul_base(scalar: &Scalar) -> RistrettoPoint {
-        CompressedRistretto(RISTRETTO255_BASEPOINT_COMPRESSED)
-            .decompress()
-            .expect("Basepoint should always decompress")
-            * scalar
+        // For now, use a direct construction of the basepoint
+        // TODO: Implement proper Ristretto basepoint handling
+        let edwards_basepoint = EdwardsPoint::mul_base(scalar);
+        RistrettoPoint(edwards_basepoint.mul_by_cofactor())
     }
 
     /// Return the Ristretto255 basepoint.
     pub fn basepoint() -> RistrettoPoint {
-        CompressedRistretto(RISTRETTO255_BASEPOINT_COMPRESSED)
-            .decompress()
-            .expect("Basepoint should always decompress")
+        // For now, construct from the Edwards basepoint
+        // TODO: Implement proper Ristretto basepoint handling
+        let edwards_compressed = crate::edwards::CompressedEdwardsY(crate::constants::ED25519_BASEPOINT_COMPRESSED);
+        let edwards_basepoint = edwards_compressed.decompress().unwrap();
+        RistrettoPoint(edwards_basepoint.mul_by_cofactor())
     }
 
     /// Convert from an Edwards point.
@@ -147,7 +149,7 @@ impl Compress for RistrettoPoint {
     }
 }
 
-impl crate::traits::Decompress<RistrettoPoint> for CompressedRistretto {
+impl Decompress<RistrettoPoint> for CompressedRistretto {
     fn decompress(&self) -> Option<RistrettoPoint> {
         // Ristretto decompression algorithm  
         // This is simplified - the actual algorithm is more complex

@@ -10,11 +10,15 @@ pub mod ring_signatures;
 pub mod threshold;
 pub mod bulletproofs;
 pub mod aes_gcm;
+pub mod noise;
+pub mod gossip;
 
-pub use ed25519::*;
-pub use x25519::*;
+pub use ed25519::{SecretKey as Ed25519SecretKey, PublicKey as Ed25519PublicKey, Signature as Ed25519Signature, SignatureError as Ed25519SignatureError};
+pub use x25519::{SecretKey as X25519SecretKey, PublicKey as X25519PublicKey, SharedSecret, KeyExchangeError};
 pub use vrf::*;
 pub use ring_signatures::*;
 pub use threshold::*;
 pub use bulletproofs::*;
 pub use aes_gcm::*;
+pub use noise::*;
+pub use gossip::*;

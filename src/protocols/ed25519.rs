@@ -3,9 +3,9 @@
 //! This module implements the Ed25519 signature scheme as specified in RFC 8032.
 //! Ed25519 provides fast, secure digital signatures using the Edwards form of Curve25519.
 
-use crate::{EdwardsPoint, Scalar, FieldElement};
+use crate::{EdwardsPoint, Scalar};
 use crate::traits::{Compress, Decompress};
-use subtle::{Choice, ConstantTimeEq};
+use subtle::ConstantTimeEq;
 
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;

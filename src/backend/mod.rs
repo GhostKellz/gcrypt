@@ -25,6 +25,7 @@ pub mod simd_avx2;
 pub use simd_avx2::{FieldElement4x, EdwardsPoint4x, multiscalar_mul_simd};
 
 /// Runtime CPU feature detection for backend selection
+#[allow(dead_code)]
 pub fn get_optimal_backend() -> BackendType {
     #[cfg(all(target_arch = "x86_64", feature = "std"))]
     {
@@ -42,6 +43,7 @@ pub fn get_optimal_backend() -> BackendType {
 
 /// Available backend types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum BackendType {
     Serial32,
     Serial64,

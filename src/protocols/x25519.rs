@@ -3,7 +3,7 @@
 //! This module implements the X25519 Elliptic Curve Diffie-Hellman (ECDH) 
 //! key exchange as specified in RFC 7748.
 
-use crate::{Scalar, MontgomeryPoint, FieldElement};
+use crate::{Scalar, MontgomeryPoint};
 use subtle::ConstantTimeEq;
 
 #[cfg(feature = "alloc")]

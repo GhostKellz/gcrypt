@@ -15,7 +15,6 @@ use crate::{
     field::FieldElement,
     scalar::Scalar,
     traits::{Identity, IsIdentity, ValidPoint, Compress, ScalarMul, Decompress},
-    constants::ED25519_BASEPOINT_COMPRESSED,
 };
 
 /// A point on the Edwards form of Curve25519.

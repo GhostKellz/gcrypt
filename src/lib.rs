@@ -78,6 +78,13 @@ pub mod ristretto;
 pub mod constants;
 pub mod traits;
 
+// Additional curve support
+#[cfg(feature = "secp256k1")]
+pub mod secp256k1;
+
+#[cfg(feature = "bls12_381")]
+pub mod bls12_381;
+
 // Protocol implementations
 pub mod protocols;
 
