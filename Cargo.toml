@@ -26,9 +26,22 @@ legacy-compatibility = []
 # Cryptographic algorithm features needed by gquic and walletd
 ed25519 = []
 secp256k1 = ["dep:secp256k1", "dep:bitcoin_hashes"]
-blake3 = []
+secp256r1 = ["dep:p256"]
+blake3 = ["dep:blake3"]
 bls12_381 = ["dep:bls12_381", "dep:blst", "dep:sha2"]
 aes-gcm = ["dep:aes-gcm"]
+chacha20-poly1305 = ["dep:chacha20poly1305"]
+# Key derivation and wallet features
+bip39 = ["dep:bip39"]
+bip32 = ["dep:bip32"]
+hkdf = ["dep:hkdf"]
+# Hash algorithms
+sha2 = ["dep:sha2"]
+sha3 = ["dep:sha3"]
+# MAC algorithms
+hmac = ["dep:hmac"]
+# KDF algorithms
+argon2 = ["dep:argon2"]
 # New features for production readiness
 simd = []  # Enable SIMD optimizations
 fiat-crypto = ["dep:fiat-crypto"]  # Formal verification
@@ -49,9 +62,18 @@ criterion = { version = "0.5", features = ["html_reports"], optional = true }
 aes-gcm = { version = "0.10", default-features = false, features = ["aes", "alloc"], optional = true }
 secp256k1 = { version = "0.31", default-features = false, features = ["recovery", "rand"], optional = true }
 bitcoin_hashes = { version = "0.15", default-features = false, optional = true }
+p256 = { version = "0.13", default-features = false, features = ["ecdsa", "arithmetic"], optional = true }
+blake3 = { version = "1.5", default-features = false, optional = true }
 bls12_381 = { version = "0.8", default-features = false, features = ["alloc", "groups", "pairings", "experimental"], optional = true }
 sha2 = { version = "0.10", default-features = false, optional = true }
+sha3 = { version = "0.10", default-features = false, optional = true }
 blst = { version = "0.3", default-features = false, optional = true }
+chacha20poly1305 = { version = "0.10", default-features = false, features = ["alloc"], optional = true }
+bip39 = { version = "2.0", default-features = false, features = ["alloc"], optional = true }
+bip32 = { version = "0.5", default-features = false, features = ["alloc"], optional = true }
+hkdf = { version = "0.12", default-features = false, optional = true }
+hmac = { version = "0.12", default-features = false, optional = true }
+argon2 = { version = "0.5", default-features = false, features = ["alloc"], optional = true }
 
 [dev-dependencies]
 rand = "0.8"

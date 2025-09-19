@@ -78,9 +78,22 @@ pub mod ristretto;
 pub mod constants;
 pub mod traits;
 
+// Cryptographic primitives
+pub mod hash;
+pub mod mac;
+pub mod kdf;
+pub mod aead;
+
+// Wallet functionality
+#[cfg(any(feature = "bip39", feature = "bip32"))]
+pub mod wallet;
+
 // Additional curve support
 #[cfg(feature = "secp256k1")]
 pub mod secp256k1;
+
+#[cfg(feature = "secp256r1")]
+pub mod p256;
 
 #[cfg(feature = "bls12_381")]
 pub mod bls12_381;
