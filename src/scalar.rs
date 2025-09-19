@@ -105,6 +105,16 @@ impl Scalar {
         Self::from_bytes_mod_order_wide(&bytes)
     }
 
+    /// Construct a scalar from a u64 value.
+    ///
+    /// This converts the u64 to bytes in little-endian format and
+    /// creates a scalar from those bytes.
+    pub fn from_u64(value: u64) -> Scalar {
+        let mut bytes = [0u8; 32];
+        bytes[..8].copy_from_slice(&value.to_le_bytes());
+        Self::from_bytes_mod_order(bytes)
+    }
+
     /// Compute the multiplicative inverse of this scalar.
     ///
     /// Returns `None` if the scalar is zero.

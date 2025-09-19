@@ -13,6 +13,13 @@ pub mod aes_gcm;
 pub mod noise;
 pub mod gossip;
 
+// Phase 2 advanced protocols
+pub mod bls;
+pub mod schnorr;
+pub mod shamir;
+pub mod commitments;
+pub mod merkle;
+
 pub use ed25519::{SecretKey as Ed25519SecretKey, PublicKey as Ed25519PublicKey, Signature as Ed25519Signature, SignatureError as Ed25519SignatureError};
 pub use x25519::{SecretKey as X25519SecretKey, PublicKey as X25519PublicKey, SharedSecret, KeyExchangeError};
 pub use vrf::*;

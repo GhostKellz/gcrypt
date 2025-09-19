@@ -17,6 +17,12 @@ use sha3::{Sha3_256, Sha3_512};
 #[cfg(feature = "blake3")]
 use crate::hash::Blake3HasherWrapper;
 
+#[cfg(feature = "chacha20-poly1305")]
+use chacha20poly1305::aead::{KeyInit, Mac as AeadMac};
+
+#[cfg(feature = "chacha20-poly1305")]
+use chacha20poly1305::Poly1305;
+
 #[cfg(feature = "zeroize")]
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
@@ -169,6 +175,14 @@ pub struct Blake3Mac {
     hasher: Blake3HasherWrapper,
 }
 
+/// Poly1305 MAC implementation
+#[cfg(feature = "chacha20-poly1305")]
+#[derive(Clone)]
+#[cfg_attr(feature = "zeroize", derive(ZeroizeOnDrop))]
+pub struct Poly1305Mac {
+    inner: Poly1305,
+}
+
 #[cfg(feature = "blake3")]
 impl MessageAuthenticationCode for Blake3Mac {
     type Output = [u8; 32];
@@ -208,6 +222,58 @@ impl MessageAuthenticationCode for Blake3Mac {
         } else {
             Err(Error::VerificationFailed)
         }
+    }
+}
+
+#[cfg(feature = "chacha20-poly1305")]
+impl MessageAuthenticationCode for Poly1305Mac {
+    type Output = [u8; 16];
+
+    fn new(key: &[u8]) -> Result<Self, Error> {
+        if key.len() != 32 {
+            return Err(Error::InvalidKeyLength);
+        }
+        let inner = Poly1305::new_from_slice(key)
+            .map_err(|e| Error::MacError(format!("{:?}", e)))?;
+        Ok(Self { inner })
+    }
+
+    fn update(&mut self, data: &[u8]) {
+        self.inner.update(data);
+    }
+
+    fn finalize(self) -> Self::Output {
+        self.inner.finalize().into_bytes().into()
+    }
+
+    fn verify(&self, expected: &[u8]) -> Result<(), Error> {
+        // Clone for verification since finalize consumes self
+        let mut verifier = self.inner.clone();
+        let computed = verifier.finalize();
+
+        if computed.into_bytes().as_slice() == expected {
+            Ok(())
+        } else {
+            Err(Error::VerificationFailed)
+        }
+    }
+}
+
+#[cfg(feature = "chacha20-poly1305")]
+impl Poly1305Mac {
+    /// Create a new Poly1305 MAC with a 32-byte key
+    pub fn new_from_key(key: &[u8; 32]) -> Result<Self, Error> {
+        Self::new(key)
+    }
+
+    /// Get the tag size (always 16 bytes for Poly1305)
+    pub const fn tag_size() -> usize {
+        16
+    }
+
+    /// Get the key size (always 32 bytes)
+    pub const fn key_size() -> usize {
+        32
     }
 }
 
@@ -253,6 +319,12 @@ pub mod utils {
     #[cfg(feature = "blake3")]
     pub fn blake3_mac(key: &[u8; 32], data: &[u8]) -> [u8; 32] {
         Blake3Mac::compute(key, data).expect("Blake3 MAC should not fail")
+    }
+
+    /// Compute Poly1305 MAC
+    #[cfg(feature = "chacha20-poly1305")]
+    pub fn poly1305_mac(key: &[u8; 32], data: &[u8]) -> Result<[u8; 16], Error> {
+        Poly1305Mac::compute(key, data)
     }
 
     /// Constant-time MAC verification

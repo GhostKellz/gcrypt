@@ -101,6 +101,19 @@ pub mod bls12_381;
 // Protocol implementations
 pub mod protocols;
 
+// Phase 3 advanced cryptographic modules
+#[cfg(feature = "zk-snarks")]
+pub mod zk;
+
+#[cfg(feature = "post-quantum")]
+pub mod post_quantum;
+
+#[cfg(feature = "mpc")]
+pub mod mpc;
+
+#[cfg(feature = "hsm")]
+pub mod hsm;
+
 // Internal modules  
 mod backend;
 mod window;

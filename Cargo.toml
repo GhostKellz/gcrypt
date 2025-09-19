@@ -47,6 +47,13 @@ simd = []  # Enable SIMD optimizations
 fiat-crypto = ["dep:fiat-crypto"]  # Formal verification
 security-audit = []  # Enable additional security checks
 benchmarks = ["dep:criterion"]  # Enable benchmark suite
+# Phase 3 advanced features (experimental)
+zk-snarks = []  # zk-SNARKs framework (dependencies not available)
+plonk = []  # PLONK proof system (dependencies not available)
+stark = []  # STARK proof system (dependencies not available)
+post-quantum = []  # Post-quantum cryptography (dependencies not available)
+mpc = []  # Multi-party computation (self-contained)
+hsm = []  # Hardware security module support (self-contained)
 
 [dependencies]
 cfg-if = "1.0"
@@ -74,6 +81,8 @@ bip32 = { version = "0.5", default-features = false, features = ["alloc"], optio
 hkdf = { version = "0.12", default-features = false, optional = true }
 hmac = { version = "0.12", default-features = false, optional = true }
 argon2 = { version = "0.5", default-features = false, features = ["alloc"], optional = true }
+# Phase 3 dependencies are commented out as they are not available or incompatible
+# These would be enabled when proper dependencies become available
 
 [dev-dependencies]
 rand = "0.8"
