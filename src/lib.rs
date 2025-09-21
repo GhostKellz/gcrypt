@@ -22,7 +22,7 @@
 //! ## Features
 //!
 //! - `std` (default): Enable standard library support
-//! - `alloc` (default): Enable allocator support for no-std environments  
+//! - `alloc` (default): Enable allocator support for no-std environments
 //! - `rand_core` (default): Enable random number generation support
 //! - `serde`: Enable serialization/deserialization support
 //! - `zeroize`: Enable secure memory zeroing
@@ -32,7 +32,17 @@
 //! - `precomputed-tables`: Enable precomputed lookup tables for faster operations
 //! - `aes-gcm`: Enable AES-GCM authenticated encryption support
 //!
-//! ## Example
+//! ### Ghostchain Ecosystem Features
+//!
+//! - `gquic-transport`: GQUIC transport layer integration for high-performance networking
+//! - `guardian-framework`: Zero-trust authentication framework for secure gRPC services
+//! - `zk-hash`: ZK-friendly hash functions (Poseidon, Rescue, MiMC, Pedersen)
+//! - `batch-operations`: High-throughput batch operations for DeFi protocols
+//! - `parallel`: Parallel processing support using Rayon
+//!
+//! ## Examples
+//!
+//! ### Basic Cryptographic Operations
 //!
 //! ```rust
 //! use gcrypt::{Scalar, EdwardsPoint};
@@ -45,6 +55,27 @@
 //!
 //! // Point addition
 //! let doubled = &point + &point;
+//! ```
+//!
+//! ### Ghostchain Ecosystem Features
+//!
+//! ```rust
+//! # #[cfg(all(feature = "guardian-framework", feature = "gquic-transport"))]
+//! # fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! use gcrypt::guardian::{GuardianIssuer, Did, Permission};
+//! use gcrypt::transport::GquicTransport;
+//!
+//! // Create a Guardian token for authentication
+//! let issuer = GuardianIssuer::new(secret_key);
+//! let did = Did::new("ghostchain".to_string(), "user123".to_string())?;
+//! let permissions = vec![Permission::new("ghostd".to_string(), vec!["read".to_string()])];
+//! let token = issuer.issue_token(did, permissions, 3600)?;
+//!
+//! // Use GQUIC transport for high-performance networking
+//! let transport = GquicTransport::new();
+//! let encrypted = transport.encrypt_packet(&mut session, plaintext, additional_data)?;
+//! # Ok(())
+//! # }
 //! ```
 
 #![no_std]
@@ -114,7 +145,20 @@ pub mod mpc;
 #[cfg(feature = "hsm")]
 pub mod hsm;
 
-// Internal modules  
+// Ghostchain ecosystem modules
+#[cfg(feature = "gquic-transport")]
+pub mod transport;
+
+#[cfg(feature = "guardian-framework")]
+pub mod guardian;
+
+#[cfg(feature = "zk-hash")]
+pub mod zk_hash;
+
+#[cfg(feature = "batch-operations")]
+pub mod batch;
+
+// Internal modules
 mod backend;
 mod window;
 

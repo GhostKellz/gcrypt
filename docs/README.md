@@ -1,140 +1,212 @@
 # gcrypt Documentation
 
-Welcome to the gcrypt documentation! This directory contains comprehensive guides for using gcrypt in various programming environments and crypto projects.
+Welcome to the comprehensive documentation for gcrypt, the premier Rust cryptographic library for the Ghostchain blockchain ecosystem.
 
-## Quick Navigation
+## Quick Start
 
-### 📚 **Core Documentation**
-- [**API Reference**](api-reference.md) - Complete API documentation with examples
-- [**Getting Started**](getting-started.md) - Quick start guide for new users
-- [**Migration Guide**](migration-guide.md) - Migrating from other crypto libraries
+- **[Main README](../README.md)** - Project overview and basic usage examples
+- **[API Documentation](api.md)** - Complete API reference for all modules
+- **[Feature Guide](features.md)** - Detailed guide to feature flags and capabilities
+- **[Migration Guide](migration.md)** - How to migrate from other cryptographic libraries
+- **[Performance Benchmarks](benchmarks.md)** - Comprehensive performance analysis
 
-### 🛠️ **Language Integration**
-- [**Rust Integration**](rust-integration.md) - Using gcrypt in Rust projects
-- [**Zig Integration**](zig-integration.md) - Using gcrypt from Zig via C FFI
-- [**C/C++ Integration**](c-integration.md) - C bindings and C++ wrappers
-- [**Python Integration**](python-integration.md) - Python bindings and usage
-- [**JavaScript Integration**](javascript-integration.md) - WASM and Node.js usage
+## Documentation Structure
 
-### 🔐 **Cryptographic Protocols**
-- [**Ed25519 Signatures**](protocols/ed25519.md) - Digital signature implementation
-- [**X25519 Key Exchange**](protocols/x25519.md) - Elliptic curve Diffie-Hellman
-- [**VRF Implementation**](protocols/vrf.md) - Verifiable Random Functions
-- [**Ring Signatures**](protocols/ring-signatures.md) - Anonymous signatures
-- [**Threshold Signatures**](protocols/threshold.md) - Multi-party signatures
-- [**Bulletproofs**](protocols/bulletproofs.md) - Zero-knowledge range proofs
+### 📖 Core Documentation
 
-### 🚀 **Advanced Topics**
-- [**Performance Guide**](performance.md) - Optimization and benchmarking
-- [**Security Best Practices**](security.md) - Secure implementation patterns
-- [**SIMD Acceleration**](simd.md) - Vectorized operations
-- [**Formal Verification**](formal-verification.md) - Mathematical correctness
-- [**Cross-Platform Deployment**](deployment.md) - Platform-specific considerations
+| Document | Description | Target Audience |
+|----------|-------------|-----------------|
+| [API Documentation](api.md) | Complete API reference with examples | Developers integrating gcrypt |
+| [Feature Guide](features.md) | Detailed feature flag documentation | All users |
+| [Migration Guide](migration.md) | Migration from other libraries | Existing users of curve25519-dalek, etc. |
+| [Performance Benchmarks](benchmarks.md) | Comprehensive performance analysis | Performance-conscious developers |
 
-### 🔗 **Project Integration**
-- [**Blockchain Projects**](integration/blockchain.md) - Cryptocurrency and DeFi applications
-- [**Web Applications**](integration/web.md) - HTTPS, WebAuthn, and secure messaging
-- [**IoT and Embedded**](integration/embedded.md) - Resource-constrained environments
-- [**Enterprise Systems**](integration/enterprise.md) - Large-scale deployments
+### 🏗️ Architecture Documentation
 
-## API Overview
+#### Core Cryptographic Primitives
+- **Scalar Arithmetic**: Operations modulo the Curve25519 group order
+- **Edwards25519**: Ed25519 digital signatures and point operations
+- **Montgomery Form**: X25519 key exchange and Montgomery ladder
+- **Ristretto255**: Prime-order group for advanced protocols
+- **Field Elements**: Arithmetic over GF(2^255 - 19)
 
-gcrypt provides three main API levels:
+#### Ghostchain Ecosystem Features
+- **GQUIC Transport**: High-performance packet encryption for Etherlink
+- **Guardian Framework**: Zero-trust authentication with DIDs
+- **ZK-Friendly Hashes**: Circuit-efficient hash functions for privacy
+- **Batch Operations**: High-throughput processing for DeFi protocols
 
-### **Level 1: Core Primitives**
-```rust
-use gcrypt::{Scalar, EdwardsPoint, FieldElement};
+### 🚀 Getting Started by Use Case
 
-// Basic scalar and point operations
-let scalar = Scalar::random(&mut rng);
-let point = EdwardsPoint::mul_base(&scalar);
-```
-
-### **Level 2: Cryptographic Protocols**
-```rust
-use gcrypt::protocols::{Ed25519, X25519, VRF};
-
-// High-level protocol implementations
-let secret_key = Ed25519::SecretKey::generate(&mut rng);
-let signature = secret_key.sign(message, &mut rng);
-```
-
-### **Level 3: Application Integrations**
-```rust
-use gcrypt::integrations::{WebCrypto, BlockchainSigning};
-
-// Framework-specific integrations
-let web_key = WebCrypto::generate_keypair()?;
-let blockchain_tx = BlockchainSigning::sign_transaction(tx, &key)?;
-```
-
-## Quick Examples
-
-### Rust
-```rust
-use gcrypt::protocols::Ed25519;
-use rand::rngs::OsRng;
-
-let secret_key = Ed25519::SecretKey::generate(&mut OsRng);
-let public_key = secret_key.public_key();
-let signature = secret_key.sign(b"message", &mut OsRng);
-assert!(public_key.verify(b"message", &signature).is_ok());
-```
-
-### Zig
-```zig
-const gcrypt = @cImport(@cInclude("gcrypt.h"));
-
-var secret_key: gcrypt.Ed25519SecretKey = undefined;
-var public_key: gcrypt.Ed25519PublicKey = undefined;
-var signature: gcrypt.Ed25519Signature = undefined;
-
-_ = gcrypt.ed25519_generate_keypair(&secret_key, &public_key);
-_ = gcrypt.ed25519_sign(&secret_key, "message", 7, &signature);
-```
-
-### Python
-```python
-import gcrypt
-
-secret_key = gcrypt.Ed25519SecretKey.generate()
-public_key = secret_key.public_key()
-signature = secret_key.sign(b"message")
-assert public_key.verify(b"message", signature)
-```
-
-## Feature Flags
-
-Configure gcrypt for your specific needs:
-
+#### Blockchain Node Operators
 ```toml
-[dependencies]
-gcrypt = { version = "0.2", features = [
-    "std",           # Standard library support
-    "simd",          # SIMD acceleration
-    "fiat-crypto",   # Formal verification
-    "zeroize",       # Secure memory clearing
-    "serde",         # Serialization support
-    "rand_core",     # Random number generation
-] }
+gcrypt = {
+    version = "0.1",
+    features = ["gquic-transport", "guardian-framework", "batch-operations", "parallel"]
+}
 ```
+- Start with: [API Documentation - GQUIC Transport](api.md#gquic-transport-module)
+- See: [Performance Benchmarks - DeFi Protocols](benchmarks.md#defi-protocol-benchmarks)
 
-## Performance Characteristics
+#### DeFi Protocol Developers
+```toml
+gcrypt = {
+    version = "0.1",
+    features = ["batch-operations", "parallel", "guardian-framework"]
+}
+```
+- Start with: [API Documentation - Batch Operations](api.md#batch-operations-module)
+- See: [Performance Benchmarks - Batch Operations](benchmarks.md#batch-operations-performance)
 
-| Operation | Cycles (x86_64) | Throughput | Memory |
-|-----------|----------------|------------|---------|
-| Scalar Mul | ~250K | 4,000 ops/sec | 160 bytes |
-| Ed25519 Sign | ~280K | 3,600 sigs/sec | 192 bytes |
-| Ed25519 Verify | ~320K | 3,100 verifs/sec | 160 bytes |
-| X25519 Exchange | ~260K | 3,800 exchanges/sec | 128 bytes |
+#### Privacy Application Developers
+```toml
+gcrypt = {
+    version = "0.1",
+    features = ["zk-hash", "batch-operations"]
+}
+```
+- Start with: [API Documentation - ZK-Friendly Hashes](api.md#zk-friendly-hash-functions-module)
+- See: [Feature Guide - ZK Hash](features.md#zk-hash)
 
-## Community and Support
+#### Embedded/IoT Developers
+```toml
+gcrypt = {
+    version = "0.1",
+    default-features = false,
+    features = ["alloc"]  # optional
+}
+```
+- Start with: [Feature Guide - No-std Usage](features.md#minimal-configuration)
+- See: [Migration Guide - No-std](migration.md#no-std-migration)
 
-- **GitHub Issues**: Report bugs and request features
-- **Documentation**: Comprehensive guides and examples
-- **Security**: Responsible disclosure program
-- **Contributing**: Contribution guidelines and code of conduct
+### 📚 Reference Materials
 
-## License
+#### Feature Flags Reference
+| Flag | Purpose | Dependencies |
+|------|---------|--------------|
+| `std` | Standard library support | None |
+| `alloc` | Allocation support | None |
+| `gquic-transport` | GQUIC transport layer | `alloc` |
+| `guardian-framework` | Authentication system | `alloc` |
+| `zk-hash` | ZK-friendly hash functions | None |
+| `batch-operations` | High-throughput operations | `alloc` |
+| `parallel` | Multi-core processing | `batch-operations` |
 
-gcrypt is licensed under the MIT License. See [LICENSE](../LICENSE) for details.
+See [Feature Guide](features.md) for complete details.
+
+#### Performance Quick Reference
+| Operation | Single | Batch (1000) | Speedup |
+|-----------|--------|--------------|---------|
+| Signature Verification | 2.0 ms | 48 ms | 10.5x |
+| Scalar Multiplication | 52 μs | 28 ms | 1.8x |
+| GQUIC Packet Encryption | 2.1 μs | 800 μs | 2.6x |
+| Poseidon Hash | 12.3 μs | 8.7 ms | 1.4x |
+
+See [Performance Benchmarks](benchmarks.md) for complete analysis.
+
+### 🔧 Development Resources
+
+#### Examples
+Located in the [`examples/`](../examples/) directory:
+- `ghostchain_integration.rs` - Complete ecosystem integration
+- `gquic_transport.rs` - GQUIC transport usage
+- `guardian_auth.rs` - Authentication and authorization
+- `batch_operations.rs` - High-throughput operations
+- `zk_hash_functions.rs` - Zero-knowledge hash functions
+
+#### Tests
+- Unit tests: `cargo test`
+- Integration tests: `cargo test --all-features`
+- Feature-specific tests: `cargo test --features <feature>`
+
+#### Benchmarks
+- Official benchmarks: `cargo bench`
+- Example benchmarks: `cargo run --example <name> --release`
+
+### 🏢 Ghostchain Ecosystem Integration
+
+gcrypt is designed as the foundational cryptographic library for:
+
+#### 🔗 [Ghostchain Core](https://github.com/ghostkellz/ghostchain)
+- Primary Rust blockchain implementation
+- Wallet services and transaction processing
+- **Integration**: Core cryptographic operations, batch transaction validation
+
+#### 🌉 [Ghostbridge](https://github.com/ghostkellz/ghostbridge)
+- Cross-chain bridge infrastructure
+- **Integration**: Guardian framework authentication, high-throughput batch operations
+
+#### 🚀 [Etherlink](https://github.com/ghostkellz/etherlink)
+- gRPC communication with GQUIC transport
+- **Integration**: GQUIC packet encryption, Guardian authentication headers
+
+#### ⚡ Ghostplane (Work in Progress)
+- Layer 2 blockchain in Zig
+- **Integration**: FFI bindings for core cryptographic operations
+
+### 🛡️ Security Considerations
+
+#### Constant-Time Operations
+All cryptographic operations are implemented to resist timing attacks:
+- Scalar arithmetic uses Montgomery representation
+- Point operations use complete addition formulas
+- Conditional operations use constant-time selection
+
+#### Memory Safety
+- Written in safe Rust with minimal unsafe blocks
+- Secure memory clearing with zeroize feature
+- Protection against double-free and use-after-free
+
+#### Side-Channel Resistance
+- Operations resist cache-timing attacks
+- Uniform memory access patterns
+- No secret-dependent branching
+
+See [API Documentation - Security](api.md#thread-safety) for details.
+
+### 📞 Support and Community
+
+#### Getting Help
+- **Documentation Issues**: Check this documentation first
+- **API Questions**: See [API Documentation](api.md)
+- **Performance Questions**: See [Performance Benchmarks](benchmarks.md)
+- **Migration Help**: See [Migration Guide](migration.md)
+
+#### Reporting Issues
+- **Security Issues**: Report privately to security contact
+- **Bug Reports**: Use GitHub issues with reproduction steps
+- **Feature Requests**: Use GitHub issues with use case description
+
+#### Contributing
+- Read the main [README](../README.md) for contribution guidelines
+- Follow Rust coding standards and conventions
+- Include tests and documentation for new features
+- Run `cargo test --all-features` and `cargo clippy --all-features`
+
+### 📈 Roadmap and Future Development
+
+#### Current Focus (v0.1.x)
+- Stable Ghostchain ecosystem integration
+- Performance optimization for DeFi workloads
+- Comprehensive testing and documentation
+
+#### Future Versions
+- **v0.2**: Post-quantum preparation
+- **v0.3**: Hardware acceleration (GPU support)
+- **v0.4**: Formal verification integration
+
+See the main [TODO.md](../TODO.md) for detailed roadmap.
+
+### 📄 License and Legal
+
+gcrypt is dual-licensed under:
+- MIT License
+- Apache License 2.0
+
+This documentation is licensed under the same terms as the codebase.
+
+---
+
+**Last Updated**: January 2025
+**gcrypt Version**: 0.1.0
+**Rust Edition**: 2024
