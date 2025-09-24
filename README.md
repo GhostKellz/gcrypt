@@ -15,9 +15,17 @@
 
 </div>
 
-## 🚀 Production-Ready for Ghostchain Ecosystem
+## DISCLAIMER
 
-**gcrypt powers the Ghostchain blockchain ecosystem with enterprise-grade cryptographic operations!**
+⚠️ **EXPERIMENTAL LIBRARY - FOR LAB/PERSONAL USE** ⚠️
+
+This is an experimental library under active development. It is
+intended for research, learning, and personal projects. The API is subject
+to change!
+
+## 🚀 Features
+
+**gcrypt provides cryptographic operations for blockchain applications.**
 
 ### ✅ Enterprise-Grade Features
 
